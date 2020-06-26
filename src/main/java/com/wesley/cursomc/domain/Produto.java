@@ -25,7 +25,7 @@ public class Produto implements Serializable {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	private String nome;
-	private double preço;
+	private double preco;
 	
 	@JsonIgnore
 	public List<Pedido> getPedidos(){
@@ -55,7 +55,7 @@ public class Produto implements Serializable {
 		super();
 		this.id = id;
 		this.nome = nome;
-		this.preço = preço;
+		this.preco = preco;
 	}
 
 	public Integer getId() {
@@ -74,12 +74,12 @@ public class Produto implements Serializable {
 		this.nome = nome;
 	}
 
-	public double getPreço() {
-		return preço;
+	public double getPreco() {
+		return preco;
 	}
 
-	public void setPreço(double preço) {
-		this.preço = preço;
+	public void setPreco(double preco) {
+		this.preco = preco;
 	}
 
 	public List<Categoria> getCategorias() {
