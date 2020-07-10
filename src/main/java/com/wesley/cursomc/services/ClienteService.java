@@ -24,28 +24,25 @@ import com.wesley.cursomc.repositories.ClienteRepository;
 import com.wesley.cursomc.repositories.EnderecoRepository;
 import com.wesley.cursomc.security.UserSS;
 import com.wesley.cursomc.services.exceptions.AuthorizationException;
+import com.wesley.cursomc.services.exceptions.DataIntegrityException;
 import com.wesley.cursomc.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class ClienteService {
 
 	@Autowired
-	private BCryptPasswordEncoder pe;
-
-	@Autowired
 	private ClienteRepository repo;
 
 	@Autowired
-	private CidadeRepository cidadeRepository;
+	private EnderecoRepository enderecoRepository;
 
 	@Autowired
-	EnderecoRepository enderecoRepository;
+	private BCryptPasswordEncoder pe;
 
 	public Cliente find(Integer id) {
 
 		UserSS user = UserService.authenticated();
-
-		if (user == null || user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+		if (user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
 			throw new AuthorizationException("Acesso negado");
 		}
 
@@ -73,8 +70,7 @@ public class ClienteService {
 		try {
 			repo.deleteById(id);
 		} catch (DataIntegrityViolationException e) {
-			throw new DataIntegrityViolationException(
-					"Não é possível excluir o cliente quando há pedido atribuído à ele.");
+			throw new DataIntegrityException("Não é possível excluir porque há pedidos relacionados");
 		}
 	}
 
@@ -89,14 +85,12 @@ public class ClienteService {
 
 	public Cliente fromDTO(ClienteDTO objDto) {
 		return new Cliente(objDto.getId(), objDto.getNome(), objDto.getEmail(), null, null, null);
-		// Cidade cid = new Cidade(objDto.getCidadeId(), null, nul);
 	}
 
 	public Cliente fromDTO(ClienteNewDTO objDto) {
 		Cliente cli = new Cliente(null, objDto.getNome(), objDto.getEmail(), objDto.getCpfOuCnpj(),
 				TipoCliente.toEnum(objDto.getTipo()), pe.encode(objDto.getSenha()));
 		Cidade cid = new Cidade(objDto.getCidadeId(), null, null);
-		// Cidade cid = cidadeRepository.findOne(objDto.getCidadeId());
 		Endereco end = new Endereco(null, objDto.getLogradouro(), objDto.getNumero(), objDto.getComplemento(),
 				objDto.getBairro(), objDto.getCep(), cli, cid);
 		cli.getEnderecos().add(end);
