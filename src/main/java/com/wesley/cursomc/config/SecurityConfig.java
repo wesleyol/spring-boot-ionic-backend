@@ -27,12 +27,12 @@ import com.wesley.cursomc.security.JWTUtil;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
-	@Autowired
-	private UserDetailsService userDetailsService;
 
 	@Autowired
-	private Environment env;
+	private UserDetailsService userDetailsService;
+	
+	@Autowired
+    private Environment env;
 	
 	@Autowired
 	private JWTUtil jwtUtil;
@@ -40,23 +40,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String[] PUBLIC_MATCHERS = {
 			"/h2-console/**"
 	};
-	
+
 	private static final String[] PUBLIC_MATCHERS_GET = {
 			"/produtos/**",
 			"/categorias/**"
 	};
-	
+
 	private static final String[] PUBLIC_MATCHERS_POST = {
 			"/clientes/**",
+			"/clientes/picture/",
 			"/auth/forgot/**"
 	};
-	
+
 	@Override
-	protected void configure(HttpSecurity http) throws Exception{
+	protected void configure(HttpSecurity http) throws Exception {
 		
 		if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
-			http.headers().frameOptions().disable();
-		}
+            http.headers().frameOptions().disable();
+        }
 		
 		http.cors().and().csrf().disable();
 		http.authorizeRequests()
@@ -70,10 +71,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception{
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
 	}
-		
+	
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
